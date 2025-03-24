@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - menu-service
+      - orders-service
+
+  menu-service:
+    build:
+      context: .
+      dockerfile: services/menu/Dockerfile
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=development
+
+  orders-service:
+    build:
+      context: .
+      dockerfile: services/orders/Dockerfile
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=development
+
+  db:
+    image: keinos/sqlite3:latest
+    volumes:
+      - ./data:/data
+
+volumes:
+  data:
