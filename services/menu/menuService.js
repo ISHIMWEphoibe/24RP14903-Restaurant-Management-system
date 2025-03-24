@@ -3,7 +3,7 @@ const router = express.Router();
 const { menuDb } = require('../../config/database');
 
 // Get all menu items
-router.get('/', (req, res) => {
+router.get('/menu', (req, res) => {
     menuDb.all('SELECT * FROM menu_items', [], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 });
 
 // Add a new menu item
-router.post('/', (req, res) => {
+router.post('/menu', (req, res) => {
     const { name, description, price, category } = req.body;
     
     if (!name || !price) {
@@ -38,7 +38,7 @@ router.post('/', (req, res) => {
 });
 
 // Update a menu item
-router.put('/:id', (req, res) => {
+router.put('/menu/:id', (req, res) => {
     const { name, description, price, category } = req.body;
     
     if (!name || !price) {
@@ -60,7 +60,7 @@ router.put('/:id', (req, res) => {
 });
 
 // Delete a menu item
-router.delete('/:id', (req, res) => {
+router.delete('/menu/:id', (req, res) => {
     menuDb.run('DELETE FROM menu_items WHERE id = ?', req.params.id, function(err) {
         if (err) {
             res.status(500).json({ error: err.message });

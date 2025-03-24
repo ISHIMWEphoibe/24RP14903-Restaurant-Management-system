@@ -40,8 +40,11 @@ describe('Menu Service API', () => {
     it('should return all menu items', async () => {
       const response = await request(app).get('/menu');
       expect(response.status).toBe(200);
-      expect(response.body).toHaveLength(2);
-      expect(response.body[0]).toHaveProperty('name', 'Test Item 1');
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBe(2);
+      expect(response.body[0].name).toBe('Test Item 1');
+      expect(response.body[0].price).toBe(9.99);
+      expect(response.body[0].description).toBe('Test Description 1');
     });
   });
 
@@ -58,7 +61,10 @@ describe('Menu Service API', () => {
         .send(newItem);
 
       expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('name', newItem.name);
+      expect(response.body.id).toBeDefined();
+      expect(response.body.name).toBe(newItem.name);
+      expect(response.body.price).toBe(newItem.price);
+      expect(response.body.description).toBe(newItem.description);
     });
   });
 });
