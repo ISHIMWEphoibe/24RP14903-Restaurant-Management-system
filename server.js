@@ -23,11 +23,25 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log('Available endpoints:');
-    console.log('  - GET    /api/menu');
-    console.log('  - POST   /api/menu');
+const MAX_PORT_RETRIES = 10;
+
+function startServer(port, retryCount = 0) {
+    const server = app.listen(port)
+        .on('error', (err) => {
+            if (err.code === 'EADDRINUSE' && retryCount < MAX_PORT_RETRIES) {
+                console.log(`Port ${port} is in use, trying port ${port + 1}...`);
+                server.close();
+                startServer(port + 1, retryCount + 1);
+            } else {
+                console.error('Failed to start server:', err.message);
+                process.exit(1);
+            }
+        })
+        .on('listening', () => {
+            console.log(`Server is running on port ${port}`);
+            console.log('Available endpoints:');
+            console.log('  - GET    /api/menu');
+            console.log('  - POST   /api/menu');
     console.log('  - PUT    /api/menu/:id');
     console.log('  - DELETE /api/menu/:id');
     console.log('  - GET    /api/orders');
