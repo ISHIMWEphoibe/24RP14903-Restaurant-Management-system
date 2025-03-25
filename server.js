@@ -42,10 +42,14 @@ function startServer(port, retryCount = 0) {
             console.log('Available endpoints:');
             console.log('  - GET    /api/menu');
             console.log('  - POST   /api/menu');
-    console.log('  - PUT    /api/menu/:id');
-    console.log('  - DELETE /api/menu/:id');
-    console.log('  - GET    /api/orders');
-    console.log('  - GET    /api/orders/:id');
-    console.log('  - POST   /api/orders');
-    console.log('  - PUT    /api/orders/:id/status');
-});
+            console.log('  - PUT    /api/menu/:id');
+            console.log('  - DELETE /api/menu/:id');
+            console.log('  - GET    /api/orders');
+            console.log('  - GET    /api/orders/:id');
+            console.log('  - POST   /api/orders');
+            console.log('  - PUT    /api/orders/:id/status');
+        });
+}
+
+// Start the server
+startServer(PORT);

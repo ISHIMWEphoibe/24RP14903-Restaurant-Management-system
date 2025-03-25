@@ -3,7 +3,7 @@ const router = express.Router();
 const { menuDb } = require('../../config/database');
 
 // Get all menu items
-router.get('/menu', (req, res) => {
+router.get('/', (req, res) => {
     menuDb.all('SELECT * FROM menu_items', [], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
@@ -14,7 +14,7 @@ router.get('/menu', (req, res) => {
 });
 
 // Add a new menu item
-router.post('/menu', (req, res) => {
+router.post('/', (req, res) => {
     const { name, description, price, category } = req.body;
     
     if (!name || !price) {
@@ -38,7 +38,7 @@ router.post('/menu', (req, res) => {
 });
 
 // Update a menu item
-router.put('/menu/:id', (req, res) => {
+router.put('/:id', (req, res) => {
     const { name, description, price, category } = req.body;
     
     if (!name || !price) {

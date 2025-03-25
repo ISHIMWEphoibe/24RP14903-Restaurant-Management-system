@@ -1,31 +1,21 @@
 const request = require('supertest');
 const express = require('express');
-const sqlite3 = require('sqlite3');
 const menuService = require('./menuService');
-
-// Mock the database module
-jest.mock('../../config/database', () => ({
-  menuDb: {
-    all: jest.fn(),
-    run: jest.fn()
-  }
-}));
-
 const { menuDb } = require('../../config/database');
 
 const app = express();
 app.use(express.json());
 app.use('/', menuService);
 
+beforeEach(() => {
+  jest.clearAllMocks();
+  // Reset mock implementations
+  menuDb.all.mockReset();
+  menuDb.run.mockReset();
+});
+
 describe('Menu Service API', () => {
-  beforeEach(() => {
-    // Clear all mocks before each test
-    jest.clearAllMocks();
-  });
-
-
-
-  describe('GET /menu', () => {
+  describe('GET /', () => {
     it('should return all menu items', async () => {
       const mockMenuItems = [
         { id: 1, name: 'Test Item 1', price: 9.99, description: 'Test Description 1' },
@@ -36,34 +26,47 @@ describe('Menu Service API', () => {
         callback(null, mockMenuItems);
       });
 
-      const response = await request(app).get('/menu');
+      const response = await request(app).get('/');
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
       expect(response.body).toEqual(mockMenuItems);
     });
   });
 
-  describe('POST /menu', () => {
+  describe('POST /', () => {
     it('should create a new menu item', async () => {
       const newItem = {
         name: 'New Item',
         price: 19.99,
-        description: 'New Description'
+        description: 'New Description',
+        category: 'Test Category'
       };
 
       menuDb.run.mockImplementation((query, params, callback) => {
-        callback.call({ lastID: 1 }, null);
+        if (callback) callback.call({ lastID: 1 });
       });
 
       const response = await request(app)
-        .post('/menu')
+        .post('/')
         .send(newItem);
 
       expect(response.status).toBe(201);
-      expect(response.body.id).toBe(1);
-      expect(response.body.name).toBe(newItem.name);
-      expect(response.body.price).toBe(newItem.price);
-      expect(response.body.description).toBe(newItem.description);
+      expect(response.body).toEqual({
+        id: 1,
+        ...newItem
+      });
+    });
+
+    it('should return 400 if name or price is missing', async () => {
+      const invalidItem = {
+        description: 'Invalid Item'
+      };
+
+      const response = await request(app)
+        .post('/')
+        .send(invalidItem);
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe('Name and price are required');
     });
   });
 });
